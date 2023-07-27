@@ -8,9 +8,10 @@ from langchain.document_loaders import DirectoryLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.question_answering import load_qa_chain
 from langchain.vectorstores import Pinecone
+from pinecone.core.client.configuration import Configuration as OpenApiConfiguration
 
 # Set the OPENAI_API_KEY environment variable
-os.environ['OPENAI_API_KEY'] = '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'
+os.environ['OPENAI_API_KEY'] = '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'
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -19,7 +20,7 @@ app = Flask(__name__)
 @app.route('/chat/', methods=['GET', 'POST'])
 def home():
     # Configure OpenAI API key
-    api = "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"
+    api = "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"
     openai.api_key = api
 
     if request.method == 'GET':
@@ -54,10 +55,13 @@ def get_answer(query):
     answer = chain.run(input_documents=similar_docs, question=query)
     return answer
 
+openapi_config = OpenApiConfiguration.get_default_copy()
+openapi_config.proxy = "http://proxy.server:3128"
 # Initialize Pinecone
 pinecone.init(
     api_key="7c92cd5b-74c0-4bdd-a698-fe689ca3fbc2",
-    environment="us-west1-gcp-free"
+    environment="us-west1-gcp-free",
+    openapi_config=openapi_config
 )
 
 # Create Pinecone index and load documents
